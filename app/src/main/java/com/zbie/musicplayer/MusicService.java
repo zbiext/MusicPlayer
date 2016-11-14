@@ -22,10 +22,20 @@ import android.support.annotation.Nullable;
 @SuppressLint("NewApi")
 public class MusicService extends Service {
 
+    public static final String PREFIX            = "com.zbie.music.";
+    public static final String META_CHANGED      = PREFIX + "metachanged";
+    public static final String PLAYSTATE_CHANGED = PREFIX + "playlistchanged";
+    public static final String REFRESH           = PREFIX + "refresh";
+    public static final String PLAYLIST_CHANGED  = PREFIX + "playlistchanged";
+    public static final String TRACK_ERROR       = PREFIX + "trackerror";
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
+    public interface TrackErrorExtra {
+        String TRACK_NAME = "trackname";
+    }
 }
