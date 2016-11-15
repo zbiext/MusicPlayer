@@ -39,6 +39,7 @@ public class MusicPlayerApplication extends Application {
                     .usingMaterialDialogs(true)
                     .commit();
         }
+
         if (!ATE.config(this, "dark_theme").isConfigured()) {
             ATE.config(this, "dark_theme")
                     .activityTheme(R.style.AppThemeDark)
