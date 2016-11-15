@@ -9,6 +9,8 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import com.zbie.musicplayer.utils.ZbieUtils;
+
 import java.util.WeakHashMap;
 
 /**
@@ -74,6 +76,11 @@ public class MusicPlayer {
             }
         }
         return -1;
+    }
+
+    /** 随机播放 */
+    public static void shuffleAll(Context context) {
+        ZbieUtils.showToastS(context, "随机播放一首");
     }
 
     public static final class ServiceToken {

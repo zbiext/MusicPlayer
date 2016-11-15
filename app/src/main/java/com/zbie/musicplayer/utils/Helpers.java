@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
  */
 
 public class Helpers {
+
     public static final String getATEKey(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("dark_theme", false) ?
                 "dark_theme" : "light_theme";

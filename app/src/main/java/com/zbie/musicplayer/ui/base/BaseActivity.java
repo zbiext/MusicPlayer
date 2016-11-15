@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import com.zbie.musicplayer.MusicService;
 import com.zbie.musicplayer.R;
 import com.zbie.musicplayer.listeners.MusicStateListener;
 import com.zbie.musicplayer.utils.Helpers;
+import com.zbie.musicplayer.utils.NavigationUtils;
 import com.zbie.musicplayer.utils.ZbieUtils;
 
 import java.lang.ref.WeakReference;
@@ -162,14 +164,26 @@ public class BaseActivity extends ATEActivity implements ServiceConnection, Musi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_shuffle:
+            case android.R.id.home:
                 super.onBackPressed();
                 return true;
+            case R.id.action_shuffle:
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        MusicPlayer.shuffleAll(BaseActivity.this);
+                    }
+                }, 80);
+                return true;
             case R.id.action_equalizer:
+                NavigationUtils.navigateToEqualizer(this);
                 return true;
             case R.id.action_settings:
+                NavigationUtils.navigateToSettings(this);
                 return true;
             case R.id.action_search:
+                NavigationUtils.navigateToSearch(this);
                 return true;
         }
 

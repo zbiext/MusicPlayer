@@ -1,9 +1,11 @@
 package com.zbie.musicplayer.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.audiofx.AudioEffect;
+import android.widget.Toast;
 
 import com.zbie.musicplayer.MusicPlayer;
 
@@ -22,14 +24,55 @@ import com.zbie.musicplayer.MusicPlayer;
  */
 public class ZbieUtils {
 
+    private static Toast mToast = null;
+
     public static boolean hasEffectsPanel(final Activity activity) {
         final PackageManager packageManager = activity.getPackageManager();
         return packageManager.resolveActivity(createEffectsIntent(), PackageManager.MATCH_DEFAULT_ONLY) != null;
     }
 
-    private static Intent createEffectsIntent() {
+    public static Intent createEffectsIntent() {
         final Intent effects = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         effects.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicPlayer.getAudioSessionId());
         return effects;
     }
+
+    /*--------------- 不会重复弹出的Toast ---------------*/
+    public static final void showToast(Context context, String text, int duration) {
+        if (mToast == null) {
+            mToast = Toast.makeText(context, text, duration);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(duration);
+        }
+        mToast.show();
+    }
+
+    public static final void showToast(Context context, int resid, int duration) {
+        if (mToast == null) {
+            mToast = Toast.makeText(context, context.getResources().getString(resid), duration);
+        } else {
+            mToast.setText(context.getResources().getString(resid));
+            mToast.setDuration(duration);
+        }
+        mToast.show();
+    }
+
+    public static final void showToastL(Context context, String text) {
+        showToast(context, text, Toast.LENGTH_LONG);
+    }
+
+    public static final void showToastS(Context context, String text) {
+        showToast(context, text, Toast.LENGTH_SHORT);
+    }
+
+    public static final void showToastL(Context context, int resid) {
+        showToast(context, resid, Toast.LENGTH_LONG);
+    }
+
+    public static final void showToastS(Context context, int resid) {
+        showToast(context, resid, Toast.LENGTH_SHORT);
+    }
+    /*--------------- 不会重复弹出的Toast ---------------*/
+
 }
