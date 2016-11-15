@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
+
+    <string name="action_settings">Settings</string>
     <string name="error_playing_track">Error Playing track</string>
+    <string name="action_shuffle_all">Shuffle All</string>
+    <string name="action_equalizer">Equalizer</string>
+    <string name="search">Search</string>
 </resources>

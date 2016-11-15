@@ -4,20 +4,30 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.afollestad.appthemeengine.ATE;
 import com.afollestad.appthemeengine.ATEActivity;
+import com.zbie.musicplayer.IMusicService;
 import com.zbie.musicplayer.MusicPlayer;
 import com.zbie.musicplayer.MusicService;
 import com.zbie.musicplayer.R;
 import com.zbie.musicplayer.listeners.MusicStateListener;
+import com.zbie.musicplayer.utils.Helpers;
+import com.zbie.musicplayer.utils.ZbieUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+
+import static com.zbie.musicplayer.MusicPlayer.mService;
 
 /**
  * Created by 涛 on 2016/11/14 0014.
@@ -48,13 +58,65 @@ public class BaseActivity extends ATEActivity implements ServiceConnection, Musi
     }
 
     @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        // 播放、暂停(状态)改变
+        intentFilter.addAction(MusicService.PLAYSTATE_CHANGED);
+        // 曲目改变
+        intentFilter.addAction(MusicService.META_CHANGED);
+        // 更新播放列表，可能是播放的fragment
+        intentFilter.addAction(MusicService.REFRESH);
+        // 如果播放列表改变，通知大家
+        intentFilter.addAction(MusicService.PLAYLIST_CHANGED);
+        // 存在一个错误的正在播放的曲目
+        intentFilter.addAction(MusicService.TRACK_ERROR);
 
+        // 注册一条 播放后台状态 的广播
+        registerReceiver(mPlaybackStatus, intentFilter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        onMetaChanged();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 解绑service
+        if (mToken != null) {
+            MusicPlayer.unBindFromService(mToken);
+            mToken = null;
+        }
+
+        try {
+            unregisterReceiver(mPlaybackStatus);
+        } catch (final Throwable e) {
+        }
+        mMusicStateListener.clear();
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        mService = IMusicService.Stub.asInterface(service);
+        onMetaChanged();
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-
+        mService = null;
     }
 
     @Override
@@ -85,6 +147,39 @@ public class BaseActivity extends ATEActivity implements ServiceConnection, Musi
                 listener.onMetaChanged();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (!ZbieUtils.hasEffectsPanel(BaseActivity.this)) {
+            menu.removeItem(R.id.action_equalizer);
+        }
+        ATE.applyMenu(this, getATEKey(), menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_shuffle:
+                super.onBackPressed();
+                return true;
+            case R.id.action_equalizer:
+                return true;
+            case R.id.action_settings:
+                return true;
+            case R.id.action_search:
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Nullable
+    @Override
+    protected String getATEKey() {
+        return Helpers.getATEKey(this);
     }
 
     private class PlaybackStatus extends BroadcastReceiver {

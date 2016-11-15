@@ -7,6 +7,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.RemoteException;
 
 import java.util.WeakHashMap;
 
@@ -25,16 +26,17 @@ import java.util.WeakHashMap;
  */
 public class MusicPlayer {
 
+    // 界面与绑定的远程服务的对应 集合
     private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
-//    private static final long[] sEmptyList;
+    //    private static final long[] sEmptyList;
     public static IMusicService mService = null;
 
     static {
         mConnectionMap = new WeakHashMap<Context, ServiceBinder>();
-//        sEmptyList = new long[0];
+        //        sEmptyList = new long[0];
     }
 
-    public static ServiceToken bindToService(Context context, ServiceConnection callback) {
+    public static final ServiceToken bindToService(Context context, ServiceConnection callback) {
         Activity realActivity = ((Activity) context).getParent();
         if (realActivity == null) {
             realActivity = (Activity) context;
@@ -49,7 +51,32 @@ public class MusicPlayer {
         return null;
     }
 
-    public static class ServiceToken {
+    public static final void unBindFromService(ServiceToken token) {
+        if (token == null) {
+            return;
+        }
+        final ContextWrapper mContextWrapper = token.mWrappedContext;
+        final ServiceBinder  mBinder         = mConnectionMap.remove(mContextWrapper);
+        if (mBinder == null) {
+            return;
+        }
+        mContextWrapper.unbindService(mBinder);
+        if (mConnectionMap.isEmpty()) {
+            mService = null;
+        }
+    }
+
+    public static final int getAudioSessionId() {
+        if (mService != null) {
+            try {
+                return mService.getAudioSessionId();
+            } catch (final RemoteException ignored) {
+            }
+        }
+        return -1;
+    }
+
+    public static final class ServiceToken {
 
         public ContextWrapper mWrappedContext;
 
@@ -58,7 +85,7 @@ public class MusicPlayer {
         }
     }
 
-    private static class ServiceBinder implements ServiceConnection {
+    private static final class ServiceBinder implements ServiceConnection {
 
         private final ServiceConnection mCallback;
         private final Context           mContext;
