@@ -4,7 +4,15 @@
     <string name="action_settings">设置</string>
 
     <string name="error_playing_track">播放曲目错误</string>
+
+    <string name="library">库</string>
+    <string name="playlists">播放列表</string>
+    <string name="playing_queue">播放队列</string>
+    <string name="now_playing">正在播放</string>
+    <string name="settings">设置</string>
+    <string name="about">关于</string>
+    <string name="help_and_feedback">帮助与反馈</string>
+    <string name="search">搜索</string>
     <string name="action_shuffle_all">随机</string>
     <string name="action_equalizer">均衡器</string>
-    <string name="search">搜索</string>
 </resources>

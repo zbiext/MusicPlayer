@@ -86,6 +86,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /** 滑动特性启用/禁用的指示标志 */
     private boolean mIsSlidingEnabled;
 
+    /** 在面板view锁在内部scrolling 或 另外一个条件阻止拖拽(preventing a drag) */
+    private boolean mIsUnableToDrag;
+
     public SlidingUpPanelLayout(Context context) {
         this(context, null);
     }
@@ -180,6 +183,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         DRAGGING // 拖动状态
     }
 
+    // TODO: 2016/11/16 0016 好多地方待完善
     private class DragHelperCallback extends ViewDragHelper.Callback {
 
         @Override
