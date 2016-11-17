@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.appthemeengine.ATE;
@@ -25,10 +26,13 @@ import com.zbie.musicplayer.listeners.MusicStateListener;
 import com.zbie.musicplayer.utils.Helpers;
 import com.zbie.musicplayer.utils.NavigationUtils;
 import com.zbie.musicplayer.utils.ZbieUtils;
+import com.zbie.musicplayer.view.SlidingUpPanelLayout;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+import static android.view.View.Z;
 import static com.zbie.musicplayer.MusicPlayer.mService;
 
 /**
@@ -188,6 +192,36 @@ public class BaseActivity extends ATEActivity implements ServiceConnection, Musi
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setPanelSlideListeners(SlidingUpPanelLayout panelLayout) {
+        panelLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                ZbieUtils.showToastS(BaseActivity.this, "onPanelSlide executed");
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+                ZbieUtils.showToastS(BaseActivity.this, "onPanelCollapsed executed");
+            }
+
+            @Override
+            public void onPanelExpanded(View panel) {
+                ZbieUtils.showToastS(BaseActivity.this, "onPanelExpanded executed");
+            }
+
+            @Override
+            public void onPanelAnchored(View panel) {
+                ZbieUtils.showToastS(BaseActivity.this, "onPanelAnchored executed");
+            }
+
+            @Override
+            public void onPanelHidden(View panel) {
+                ZbieUtils.showToastS(BaseActivity.this, "onPanelHidden executed");
+            }
+        });
     }
 
     @Nullable

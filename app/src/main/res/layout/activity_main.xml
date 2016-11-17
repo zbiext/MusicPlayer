@@ -18,7 +18,7 @@
     <include layout="@layout/activity_main_list_viewpager"/>
 
     <android.support.design.widget.NavigationView
-        android:id="@+id/anv_view"
+        android:id="@+id/nav_view"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         android:layout_width="wrap_content"

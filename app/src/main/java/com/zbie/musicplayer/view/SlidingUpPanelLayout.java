@@ -174,6 +174,36 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     }
 
+    public void setPanelSlideListener(PanelSlideListener listener) {
+
+    }
+
+    /**
+     * 检查侧滑面板视图是否全部展开
+     *
+     * @return 如果侧滑慢板完全展开返回ture
+     */
+    public boolean isPanelExpanded() {
+        return mSlideState == SlideState.EXPANDED;
+    }
+
+    /**
+     * Collapse the sliding pane if it is currently slideable. If first layout
+     * has already completed this will animate.
+     *
+     * @return true if the pane was slideable and is now collapsed/in the process of collapsing
+     */
+    public boolean collapsePanel() {
+        if (mFirstLayout) {
+            mSlideState = SlideState.COLLAPSED;
+            return true;
+        } else {
+            if (mSlideState == SlideState.HIDDEN || mSlideState == SlideState.COLLAPSED)
+                return false;
+            return collapsePanel(mSlideableView, 0);
+        }
+    }
+
     /** 侧滑view的当前状态 */
     private enum SlideState {
         EXPANDED, // 展开状态
@@ -181,6 +211,46 @@ public class SlidingUpPanelLayout extends ViewGroup {
         ANCHORED, // 固定状态
         HIDDEN, // 隐藏状态
         DRAGGING // 拖动状态
+    }
+
+    /** 监听侧滑面板的事件 */
+    public interface PanelSlideListener {
+
+        /**
+         * 当侧滑面板的位置变化
+         *
+         * @param panel       被移动的子视图
+         * @param slideOffset The new offset of this sliding pane within its range，取值在0-1之间
+         */
+        void onPanelSlide(View panel, float slideOffset);
+
+        /**
+         * 当侧滑面板完全被折叠
+         *
+         * @param panel 子视图滑到折叠的位置
+         */
+        void onPanelCollapsed(View panel);
+
+        /**
+         * 当侧滑面板完全被展开
+         *
+         * @param panel 子视图滑到展开的位置
+         */
+        void onPanelExpanded(View panel);
+
+        /**
+         * 当侧滑面板完全被固定
+         *
+         * @param panel 子视图滑到固定的位置
+         */
+        void onPanelAnchored(View panel);
+
+        /**
+         * 当侧滑面板完全被隐藏
+         *
+         * @param panel 子视图滑到隐藏的位置
+         */
+        void onPanelHidden(View panel);
     }
 
     // TODO: 2016/11/16 0016 好多地方待完善
