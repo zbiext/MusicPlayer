@@ -36,4 +36,5 @@ dependencies {
     compile(name: 'app-theme-engine-0.5.2', ext: 'aar')
     compile(name: 'commons-0.9.0.2', ext: 'aar')
     compile(name: 'core-0.9.0.2', ext: 'aar')
+    compile(name: 'materialiconlib-1.0.3', ext: 'aar')
 }

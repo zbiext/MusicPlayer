@@ -49,4 +49,10 @@
     <style name="AppTheme.FullScreen.Light" parent="ThemeBaseLight">
     </style>
 
+    <style name="AppThemeNormalDark" parent="ThemeBaseDark">
+    </style>
+
+    <style name="AppThemeNormalLight" parent="ThemeBaseLight">
+    </style>
+
 </resources>

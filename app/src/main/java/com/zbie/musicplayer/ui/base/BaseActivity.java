@@ -22,6 +22,7 @@ import com.zbie.musicplayer.IMusicService;
 import com.zbie.musicplayer.MusicPlayer;
 import com.zbie.musicplayer.MusicService;
 import com.zbie.musicplayer.R;
+import com.zbie.musicplayer.fragments.QueueFragment;
 import com.zbie.musicplayer.listeners.MusicStateListener;
 import com.zbie.musicplayer.utils.Helpers;
 import com.zbie.musicplayer.utils.NavigationUtils;
@@ -192,6 +193,15 @@ public class BaseActivity extends ATEActivity implements ServiceConnection, Musi
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setMusicStateListenerListener(final MusicStateListener status) {
+        if (status == this) {
+            throw new UnsupportedOperationException("Override the method, don't add a listener");
+        }
+        if (status != null) {
+            mMusicStateListener.add(status);
+        }
     }
 
     public void setPanelSlideListeners(SlidingUpPanelLayout panelLayout) {

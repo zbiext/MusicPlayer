@@ -1,13 +1,17 @@
 package com.zbie.musicplayer.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityEvent;
 
 import com.zbie.musicplayer.R;
 
@@ -50,9 +54,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /** 组件初始化默认状态 */
     private static       SlideState DEFAULT_SLIDE_STATE         = SlideState.COLLAPSED;
     /** 探出面板的默认高度 */
-    private static final int DEFAULT_PANEL_HEIGHT = 68; // dp;
+    private static final int        DEFAULT_PANEL_HEIGHT        = 68; // dp;
     /** 探出面板之上的阴影的默认高度 */
-    private static final int DEFAULT_SHADOW_HEIGHT = 4; // dp;
+    private static final int        DEFAULT_SHADOW_HEIGHT       = 4; // dp;
 
     /** 在面板之间画阴影 */
     private final Drawable       mShadowDrawable;
@@ -67,7 +71,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private int        mSlidePanelOffset  = 0;
     /** 影子的像素高度(px) */
     private int        mShadowHeight      = -1;
-    /** 视差距离 */
+    /** 视差(偏移)距离 */
     private int        mParallaxOffset    = -1;
     /** 夹主视图给侧滑视图 */
     private boolean    mDirectOffset      = false;
@@ -88,6 +92,30 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /** 在面板view锁在内部scrolling 或 另外一个条件阻止拖拽(preventing a drag) */
     private boolean mIsUnableToDrag;
+    /**
+     * Stores whether or not the pane was expanded the last time it was slideable.
+     * If expand/collapse operations are invoked this state is modified. Used by
+     * instance state save/restore.
+     */
+    private boolean mFirstLayout = true;
+    /**
+     * The child view that can slide, if any.
+     */
+    private View  mSlideableView;
+    /**
+     * The main view
+     */
+    private View mMainView;
+    /**
+     * How far the panel is offset from its expanded position.
+     * range [0, 1] where 0 = collapsed, 1 = expanded.
+     */
+    private float mSlideOffset;
+    private PanelSlideListener mPanelSlideListener;
+    /**
+     * How far in pixels the slideable panel may move.
+     */
+    private int mSlideRange;
 
     public SlidingUpPanelLayout(Context context) {
         this(context, null);
@@ -174,8 +202,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     }
 
+    /**
+     * 设置panelSlideListener
+     *
+     * @param listener
+     */
     public void setPanelSlideListener(PanelSlideListener listener) {
-
+        if (listener != null) {
+            mPanelSlideListener =listener;
+        } else {
+            throw  new IllegalArgumentException("PanelSlideListener isn't allowed to be null!");
+        }
     }
 
     /**
@@ -201,6 +238,181 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (mSlideState == SlideState.HIDDEN || mSlideState == SlideState.COLLAPSED)
                 return false;
             return collapsePanel(mSlideableView, 0);
+        }
+    }
+
+    private boolean collapsePanel(View pane, int initialVelocity) {
+        return mFirstLayout || smoothSlideTo(0.0f, initialVelocity);
+    }
+
+    /**
+     * Smoothly animate mDraggingPane to the target X position within its range.
+     *
+     * @param slideOffset position to animate to
+     * @param velocity    initial velocity in case of fling, or 0.
+     */
+    boolean smoothSlideTo(float slideOffset, int velocity) {
+        if (!isSlidingEnabled()) {
+            // Nothing to do.
+            return false;
+        }
+        int panelTop = computePanelTopPosition(slideOffset);
+        if (mDragHelper.smoothSlideViewTo(mSlideableView, mSlideableView.getLeft(), panelTop)) {
+            setAllChildrenVisible();
+            ViewCompat.postInvalidateOnAnimation(this);
+            return true;
+        }
+        return false;
+    }
+
+    private void setAllChildrenVisible() {
+        for (int i = 0, childCount = getChildCount(); i < childCount; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() == INVISIBLE) {
+                child.setVisibility(VISIBLE);
+            }
+        }
+    }
+
+    public boolean isSlidingEnabled() {
+        return mIsSlidingEnabled && mSlideableView != null;
+    }
+
+    private int computePanelTopPosition(float slideOffset) {
+        return 0;
+    }
+
+    /**
+     * Computes the slide offset based on the top position of the panel
+     */
+    private float computeSlideOffset(int topPosition) {
+        // Compute the panel top position if the panel is collapsed (offset 0)
+        final int topBoundCollapsed = computePanelTopPosition(0);
+
+        // Determine the new slide offset based on the collapsed top position and the new required
+        // top position
+        return (mIsSlidingUp ? (float) (topBoundCollapsed - topPosition) / mSlideRange : (float) (topPosition - topBoundCollapsed) / mSlideRange);
+    }
+
+    private static boolean hasOpaqueBackground(View v) {
+        final Drawable bg = v.getBackground();
+        return bg != null && bg.getOpacity() == PixelFormat.OPAQUE;
+    }
+
+    private void updateObscuredViewVisibility() {
+        if (getChildCount() == 0) {
+            return;
+        }
+        final int leftBound   = getPaddingLeft();
+        final int rightBound  = getWidth() - getPaddingRight();
+        final int topBound    = getPaddingTop();
+        final int bottomBound = getHeight() - getPaddingBottom();
+        final int left;
+        final int right;
+        final int top;
+        final int bottom;
+        if (mSlideableView != null && hasOpaqueBackground(mSlideableView)) {
+            left = mSlideableView.getLeft();
+            right = mSlideableView.getRight();
+            top = mSlideableView.getTop();
+            bottom = mSlideableView.getBottom();
+        } else {
+            left = right = top = bottom = 0;
+        }
+        View      child              = mMainView;
+        final int clampedChildLeft   = Math.max(leftBound, child.getLeft());
+        final int clampedChildTop    = Math.max(topBound, child.getTop());
+        final int clampedChildRight  = Math.min(rightBound, child.getRight());
+        final int clampedChildBottom = Math.min(bottomBound, child.getBottom());
+        final int vis;
+        if (clampedChildLeft >= left && clampedChildTop >= top &&
+                clampedChildRight <= right && clampedChildBottom <= bottom) {
+            vis = INVISIBLE;
+        } else {
+            vis = VISIBLE;
+        }
+        child.setVisibility(vis);
+    }
+
+    private void dispatchOnPanelExpanded(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelExpanded(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    private void dispatchOnPanelCollapsed(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelCollapsed(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    private void dispatchOnPanelHidden(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelHidden(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    private void dispatchOnPanelAnchored(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelAnchored(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    private void dispatchOnPanelSlide(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelSlide(panel, mSlideOffset);
+        }
+    }
+
+    /**
+     * 获得当前视差的偏移
+     *
+     * @return 当前视差的偏移
+     */
+    public int getCurrentParalaxOffset() {
+        if (mParallaxOffset < 0) {
+            return 0;
+        }
+        return (int) (mParallaxOffset * getDirectionalSlideOffset());
+    }
+
+    /**
+     * get The directional slide offset
+     *
+     * @return The directional slide offset
+     */
+    protected float getDirectionalSlideOffset() {
+        return mIsSlidingUp ? -mSlideOffset : mSlideOffset;
+    }
+
+    @SuppressLint("NewApi")
+    private void onPanelDragged(int newTop) {
+        mSlideState = SlideState.DRAGGING;
+        // Recompute the slide offset based on the new top position
+        mSlideOffset = computeSlideOffset(newTop);
+        // Update the parallax based on the new slide offset
+        if ((mParallaxOffset > 0 || mDirectOffset) && mSlideOffset >= 0) {
+            int mainViewOffset = 0;
+            if (mParallaxOffset > 0) {
+                mainViewOffset = getCurrentParalaxOffset();
+            } else {
+                mainViewOffset = (int) (getDirectionalSlideOffset() * mSlideRange);
+            }
+            mMainView.setTranslationY(mainViewOffset);
+        }
+        // Dispatch the slide event
+        dispatchOnPanelSlide(mSlideableView);
+        // If the slide offset is negative, and overlay is not on, we need to increase the
+        // height of the main content
+        if (mSlideOffset <= 0 && !mOverlayContent) {
+            // expand the main view
+            LayoutParams lp = (LayoutParams) mMainView.getLayoutParams();
+            lp.height = mIsSlidingUp ? (newTop - getPaddingBottom()) : (getHeight() - getPaddingBottom() - mSlideableView.getMeasuredHeight() - newTop);
+            mMainView.requestLayout();
         }
     }
 
@@ -343,7 +555,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         @Override
         public int clampViewPositionVertical(View child, int top, int dy) {
             final int collapsedTop = computePanelTopPosition(0.f);
-            final int expandedTop = computePanelTopPosition(1.0f);
+            final int expandedTop  = computePanelTopPosition(1.0f);
             if (mIsSlidingUp) {
                 return Math.min(Math.max(top, expandedTop), collapsedTop);
             } else {
