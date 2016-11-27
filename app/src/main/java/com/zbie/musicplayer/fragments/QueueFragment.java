@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.zbie.musicplayer.R;
 import com.zbie.musicplayer.adapters.PlayingQueueAdapter;
+import com.zbie.musicplayer.dataloaders.QueueLoader;
 import com.zbie.musicplayer.listeners.MusicStateListener;
 import com.zbie.musicplayer.ui.base.BaseActivity;
 
@@ -56,7 +57,8 @@ public class QueueFragment extends Fragment implements MusicStateListener {
         new loadQueueSongs().execute("");
         ((BaseActivity) getActivity()).setMusicStateListenerListener(this);
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return rootView;
+        // return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -82,13 +84,14 @@ public class QueueFragment extends Fragment implements MusicStateListener {
 
         @Override
         protected String doInBackground(String... params) {
-//            mAdapter = new PlayingQueueAdapter(getActivity(), QueueLoader.getQueueSongs(getActivity()));
+            mAdapter = new PlayingQueueAdapter(getActivity(), QueueLoader.getQueueSongs(getActivity()));
             return "Executed";
         }
 
         @Override
         protected void onPostExecute(String s) {
             mRecyclerView.setAdapter(mAdapter);
+            // TODO: 2016/11/24 00:03:00 QueueFragment 待完成
         }
     }
 }

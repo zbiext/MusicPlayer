@@ -63,9 +63,9 @@ public class PlaylistFragment extends Fragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(R.string.playlists);
 
-        // TODO: 2016/11/21 01:31:11
+        // TODO: 2016/11/21 01:31:11 PlaylistFragment 待完成
 
-
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return rootView;
+        // return super.onCreateView(inflater, container, savedInstanceState);
     }
 }

@@ -60,7 +60,8 @@ public class MainFragment extends Fragment {
         tabLayout.setupWithViewPager(mViewPager);
 
         return rootView;
+        // return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    // TODO: 2016/11/21 22:28:07 待完成
+    // TODO: 2016/11/21 22:28:07 MainFragment 待完成
 }

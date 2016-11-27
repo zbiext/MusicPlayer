@@ -29,6 +29,10 @@ public class MusicService extends Service {
     public static final String PLAYLIST_CHANGED  = PREFIX + "playlistchanged";
     public static final String TRACK_ERROR       = PREFIX + "trackerror";
 
+    public static final int SHUFFLE_NONE = 0;
+    public static final int SHUFFLE_NORMAL = 1;
+    public static final int SHUFFLE_AUTO = 2;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

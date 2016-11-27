@@ -10,7 +10,9 @@ import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.zbie.musicplayer.utils.ZbieUtils;
+import com.zbie.musicplayer.utils.ZbieUtils.IdType;
 
+import java.util.Arrays;
 import java.util.WeakHashMap;
 
 /**
@@ -30,12 +32,13 @@ public class MusicPlayer {
 
     // 界面与绑定的远程服务的对应 集合
     private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
-    //    private static final long[] sEmptyList;
+
+    private static final long[] sEmptyList;
     public static IMusicService mService = null;
 
     static {
         mConnectionMap = new WeakHashMap<Context, ServiceBinder>();
-        //        sEmptyList = new long[0];
+        sEmptyList = new long[0];
     }
 
     public static final ServiceToken bindToService(Context context, ServiceConnection callback) {
@@ -83,6 +86,55 @@ public class MusicPlayer {
         ZbieUtils.showToastS(context, "随机播放一首");
     }
 
+    public static long[] getQueue() {
+        try {
+            if (mService != null) {
+                return mService.getQueue();
+            }
+        } catch (RemoteException e) {
+            // e.printStackTrace();
+        }
+        return sEmptyList;
+    }
+
+    /**
+     * 移除曲目(删除歌曲)
+     *
+     * @param id
+     * @return
+     */
+    public static final int removeTrack(final long id) {
+        try {
+            if (mService != null) {
+                return mService.removeTrack(id);
+            }
+        } catch (final RemoteException e) {
+            // e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static int getQueuePosition() {
+        try {
+            if (mService != null) {
+                return mService.getQueuePosition();
+            }
+        } catch (final RemoteException e) {
+            // e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static void setQueuePosition(final int position) {
+        if (mService != null) {
+            try {
+                mService.setQueuePosition(position);
+            } catch (final RemoteException e) {
+                // e.printStackTrace();
+            }
+        }
+    }
+
     public static final class ServiceToken {
 
         public ContextWrapper mWrappedContext;
@@ -110,6 +162,36 @@ public class MusicPlayer {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
 
+        }
+    }
+
+    public static void playAll(final Context context, final long[] list, int position,
+                               final long sourceId, final IdType sourceType,
+                               final boolean forceShuffle) {
+        if (list == null || list.length == 0 || mService == null) {
+            return;
+        }
+        try {
+            if (forceShuffle) {
+                mService.setShuffleMode(MusicService.SHUFFLE_NORMAL);
+            }
+            final long currentId = mService.getAudioId();
+            final int currentQueuePosition = getQueuePosition();
+            if (position != -1 && currentQueuePosition == position && currentId == list[position]) {
+                final long[] playlist = getQueue();
+                if (Arrays.equals(list, playlist)) {
+                    mService.play();
+                    return;
+                }
+            }
+            if (position < 0) {
+                position = 0;
+            }
+            mService.open(list, forceShuffle ? -1 : position, sourceId, sourceType.mId);
+            mService.play();
+        } catch (final RemoteException ignored) {
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
     }
 }

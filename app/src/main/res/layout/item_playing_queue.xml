@@ -18,16 +18,66 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:scaleType="center"
         app:materialIcon="drag_vertical"
-        app:materialIconColor="?attr/iconColor"
         app:materialIconSize="30dp" />
+        <!--app:materialIconColor="?attr/iconColor"-->
+
+        <ImageView
+            android:id="@+id/item_playing_albumArt"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_toRightOf="@id/item_playing_queue_reorder"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@+id/item_playing_albumArt"
+            android:layout_toLeftOf="@+id/item_playing_music_visualizer"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:id="@+id/item_playing_song_title"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/item_playing_song_artist"
+                style="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:paddingTop="3dp"
+                android:maxLines="1"
+                android:textSize="13sp" />
+        </LinearLayout>
 
 
+        <com.zbie.musicplayer.widgets.MusicVisualizer
+            android:id="@+id/item_playing_music_visualizer"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="15dp"
+            android:layout_toLeftOf="@+id/item_playing_popup_menu"
+            android:visibility="gone"/>
 
-
-
-
-
+        <com.zbie.musicplayer.widgets.PopupImageView
+            android:id="@+id/item_playing_popup_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="5dp"
+            android:src="@drawable/ic_more_vert_black_24dp"/>
+            <!--app:foregroundTint="#434343"-->
     </RelativeLayout>
-
-
 </LinearLayout>

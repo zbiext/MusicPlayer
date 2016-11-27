@@ -45,4 +45,12 @@ public class NavigationUtils {
 //        context.startActivity(intent);
     }
 
+    public static void navigateToNowplaying(Activity context, boolean withAnimations) {
+        ZbieUtils.showToastS(context, "启动正在播放界面");
+//        final Intent intent = new Intent(context, NowPlayingActivity.class);
+//        if (!PreferencesUtility.getInstance(context).getSystemAnimations()) {
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        }
+//        context.startActivity(intent);
+    }
 }

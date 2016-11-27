@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import com.afollestad.appthemeengine.customizers.ATEActivityThemeCustomizer;
 import com.zbie.musicplayer.R;
+import com.zbie.musicplayer.fragments.AlbumDetailFragment;
+import com.zbie.musicplayer.fragments.ArtistDetailFragment;
 import com.zbie.musicplayer.fragments.MainFragment;
 import com.zbie.musicplayer.fragments.PlaylistFragment;
 import com.zbie.musicplayer.fragments.QueueFragment;
@@ -149,7 +151,7 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(final MenuItem menuItem) {
-//                        updatePosition(menuItem);
+                        //                        updatePosition(menuItem);
                         return true;
 
                     }
@@ -182,7 +184,7 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
             navigationView.getMenu().findItem(R.id.nav_help).setIcon(R.drawable.payment_white);
         }
 
-        if(true/*!BillingProcessor.isIabServiceAvailable(this)*/) {
+        if (true/*!BillingProcessor.isIabServiceAvailable(this)*/) {
             navigationView.getMenu().removeItem(R.id.nav_donate);
         }
 
@@ -201,7 +203,7 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
     }
 
     private void initData() {
-        // TODO: 2016/11/20 9:44 空方法体
+        // TODO: 2016/11/20 9:44 空方法体 待完成
     }
 
     public static MainActivity getInstance() {
@@ -234,9 +236,9 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
 
     private boolean isNavigatingMain() {
         // TODO: 2016/11/17 23:18
-        //        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        //        return (currentFragment instanceof MainFragment || currentFragment instanceof QueueFragment
-        //                || currentFragment instanceof PlaylistFragment);
+        // Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        // return (currentFragment instanceof MainFragment || currentFragment instanceof QueueFragment
+        //         || currentFragment instanceof PlaylistFragment);
         return false;
     }
 
