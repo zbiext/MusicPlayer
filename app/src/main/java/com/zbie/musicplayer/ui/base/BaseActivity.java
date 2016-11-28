@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,8 +24,8 @@ import com.zbie.musicplayer.IMusicService;
 import com.zbie.musicplayer.MusicPlayer;
 import com.zbie.musicplayer.MusicService;
 import com.zbie.musicplayer.R;
-import com.zbie.musicplayer.fragments.QueueFragment;
 import com.zbie.musicplayer.listeners.MusicStateListener;
+import com.zbie.musicplayer.subfragments.QuickControlsFragment;
 import com.zbie.musicplayer.utils.Helpers;
 import com.zbie.musicplayer.utils.NavigationUtils;
 import com.zbie.musicplayer.utils.ZbieUtils;
@@ -32,8 +34,6 @@ import com.zbie.musicplayer.view.SlidingUpPanelLayout;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-import static android.view.View.Z;
 import static com.zbie.musicplayer.MusicPlayer.mService;
 
 /**
@@ -271,4 +271,25 @@ public class BaseActivity extends ATEActivity implements ServiceConnection, Musi
 
     }
 
+    public class initQuickControls extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            QuickControlsFragment fragment        = new QuickControlsFragment();
+            FragmentManager       fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.quickcontrols_container, fragment).commitAllowingStateLoss();
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            QuickControlsFragment.topContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NavigationUtils.navigateToNowplaying(BaseActivity.this, false);
+                }
+            });
+        }
+    }
 }

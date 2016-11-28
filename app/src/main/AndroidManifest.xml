@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.zbie.musicplayer">
 
     <application
         android:name=".MusicPlayerApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.FullScreen.Light">
-        <activity android:name=".ui.MainActivity">
+        android:theme="@style/AppTheme.FullScreen.Light"
+        tools:replace="android:allowBackup">
+        <activity
+            android:name=".ui.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
+                <!-- <category android:name="android.intent.category.CATEGORY_APP_MUSIC"/> 音乐app -->
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- 默认可以打开audio文件 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:scheme="file"/>
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="application/ogg"/>
+                <data android:mimeType="application/x-ogg"/>
+                <data android:mimeType="application/itunes"/>
             </intent-filter>
         </activity>
     </application>

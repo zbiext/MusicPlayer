@@ -135,6 +135,20 @@ public class MusicPlayer {
         }
     }
 
+    public static void playOrPause() {
+        try {
+            if (mService != null) {
+                if (mService.isPlaying()) {
+                    mService.pause();
+                } else {
+                    mService.play();
+                }
+            }
+        } catch (final Exception e) {
+            // e.printStackTrace();
+        }
+    }
+
     public static final class ServiceToken {
 
         public ContextWrapper mWrappedContext;

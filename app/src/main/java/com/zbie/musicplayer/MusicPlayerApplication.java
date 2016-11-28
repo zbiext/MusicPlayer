@@ -3,6 +3,7 @@ package com.zbie.musicplayer;
 import android.app.Application;
 
 import com.afollestad.appthemeengine.ATE;
+import com.zbie.musicplayer.permissions.Nammu;
 
 /**
  * Created by 涛 on 2016/11/12 0012.
@@ -29,6 +30,8 @@ public class MusicPlayerApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ourInstance = this;
+
+        Nammu.init(this);
 
         if (!ATE.config(this, "light_theme").isConfigured()) {
             ATE.config(this, "light_theme")

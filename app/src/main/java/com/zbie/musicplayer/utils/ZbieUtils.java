@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.audiofx.AudioEffect;
+import android.os.Build;
 import android.widget.Toast;
 
 import com.zbie.musicplayer.MusicPlayer;
@@ -25,6 +26,10 @@ import com.zbie.musicplayer.MusicPlayer;
 public class ZbieUtils {
 
     private static Toast mToast = null;
+
+    public static boolean isMarshmallow() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
 
     public static boolean hasEffectsPanel(final Activity activity) {
         final PackageManager packageManager = activity.getPackageManager();
@@ -55,7 +60,6 @@ public class ZbieUtils {
                     return type;
                 }
             }
-
             throw new IllegalArgumentException("Unrecognized id: " + id);
         }
     }
