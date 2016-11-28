@@ -139,6 +139,7 @@ public class QuickControlsFragment extends Fragment {
 
 
 
+
         // return super.onCreateView(inflater, container, savedInstanceState);
         return rootView;
     }
